@@ -16,9 +16,7 @@ class TimeSeriesPreprocessor:
         """
         Process and sort dataframe based on the "PI" column.
         """
-        df = (
-            df.copy()
-        )
+        df = df.copy()
 
         if "PI" in df.columns:
             df["PI"] = pd.to_numeric(df["PI"], errors="coerce")

@@ -18,7 +18,7 @@ class TimeSeriesPreprocessor:
         """
         df = (
             df.copy()
-        )  # Make a copy to avoid modifying the original dataframe inadvertently
+        )
 
         if "PI" in df.columns:
             df["PI"] = pd.to_numeric(df["PI"], errors="coerce")

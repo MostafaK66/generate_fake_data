@@ -1,9 +1,10 @@
 from utility import TimeSeriesPreprocessor
+import settings
 
 
 def main():
     preprocessor = TimeSeriesPreprocessor()
-    df = preprocessor.read_data()
+    df = preprocessor.read_data(filename=settings.filename)
 
     return df
 

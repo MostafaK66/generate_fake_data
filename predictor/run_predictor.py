@@ -1,6 +1,6 @@
 from utility import DataPreprocessor
 import settings
-from plotting import DataPlotter
+from predictor.plotting import DataPlotter
 
 
 def main():

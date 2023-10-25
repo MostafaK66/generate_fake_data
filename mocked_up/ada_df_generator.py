@@ -110,7 +110,7 @@ class AdaBottleneckGenerator:
     def assign_pi(self, df: pd.DataFrame) -> pd.DataFrame:
         """Assign Program Increment (PI) values to each ticket based on TicketStatusDate."""
 
-        pi_start_date = datetime(2023, 1, 1).date()
+        pi_start_date = datetime(2020, 1, 1).date()
 
         def get_pi_value(date: date) -> str:
             """Helper function to get the corresponding PI value for a date."""

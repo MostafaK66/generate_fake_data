@@ -91,7 +91,7 @@ class DataPreprocessor:
 
     def filter_columns(self, df):
         desired_columns = ["PI", "CumulativeDone", "CumulativeFlow"]
-        return df[desired_columns]
+        return df[desired_columns].drop_duplicates().reset_index(drop=True)
 
 
 

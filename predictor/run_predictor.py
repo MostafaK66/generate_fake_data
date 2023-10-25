@@ -5,15 +5,14 @@ import settings
 def main():
     preprocessor = TimeSeriesPreprocessor()
     df = preprocessor.read_data(filename=settings.filename)
-    ada_project_1, ada_project_2, ada_project_3 = preprocessor.split_and_process(df=df)
-    ada_project_1 = preprocessor.cumulative_done_per_pi(df=ada_project_1)
-    ada_project_2 = preprocessor.cumulative_done_per_pi(df=ada_project_2)
-    ada_project_3 = preprocessor.cumulative_done_per_pi(df=ada_project_3)
+    ada_projects = preprocessor.split_and_process(df=df)
+    ada_projects = [preprocessor.cumulative_done_per_pi(df=project) for project in ada_projects]
+    ada_projects = [preprocessor.cumulative_flow_per_pi(df=project) for project in ada_projects]
 
-    ada_project_1 = preprocessor.cumulative_flow_per_pi(df=ada_project_1)
-
-    return ada_project_1, ada_project_2, ada_project_3
+    return ada_projects
 
 
 if __name__ == "__main__":
     ada_project_1, ada_project_2, ada_project_3 = main()
+    print("yes")
+

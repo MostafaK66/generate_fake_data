@@ -60,15 +60,15 @@ class TimeSeriesPreprocessor:
         return df
 
     def cumulative_flow_per_pi(self, df):
-        # List of statuses to consider
+
         statuses = ["Refined", "In Progress", "To Do", "In Review"]
 
-        # Check if required columns are in the dataframe
+
         if not all(col in df.columns for col in ["PI", "TicketStatus"]):
             print("Required columns ('PI' or 'TicketStatus') not found in the dataframe")
             return df
 
-        # Count unique tickets per PI for given statuses
+
         valid_tickets_per_pi = (
             df[df["TicketStatus"].isin(statuses)]
             .groupby("PI")
@@ -76,15 +76,15 @@ class TimeSeriesPreprocessor:
             .reset_index(name="count_valid_tickets")
         )
 
-        # Calculate cumulative sum
+
         valid_tickets_per_pi["CumulativeFlow"] = valid_tickets_per_pi["count_valid_tickets"].cumsum()
 
-        # Merge the result back to the main dataframe
+
         df = df.merge(
             valid_tickets_per_pi[["PI", "CumulativeFlow"]], on="PI", how="left"
         )
 
-        # Fill NaN values using ffill() and then cast to integer
+
         df["CumulativeFlow"] = df["CumulativeFlow"].ffill().fillna(0).astype(int)
 
         return df

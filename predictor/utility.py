@@ -2,7 +2,7 @@ from pathlib import Path
 import pandas as pd
 
 
-class TimeSeriesPreprocessor:
+class DataPreprocessor:
     def __init__(self):
         pass
 
@@ -55,7 +55,7 @@ class TimeSeriesPreprocessor:
             done_tickets_per_pi[["PI", "CumulativeDone"]], on="PI", how="left"
         )
 
-        df["CumulativeDone"] = df["CumulativeDone"].ffill().fillna(0)
+        df["CumulativeDone"] = df["CumulativeDone"].ffill().fillna(0).astype(int)
 
         return df
 
@@ -88,6 +88,11 @@ class TimeSeriesPreprocessor:
         df["CumulativeFlow"] = df["CumulativeFlow"].ffill().fillna(0).astype(int)
 
         return df
+
+    def filter_columns(self, df):
+        desired_columns = ["PI", "CumulativeDone", "CumulativeFlow"]
+        return df[desired_columns]
+
 
 
 

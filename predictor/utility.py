@@ -89,6 +89,42 @@ class DataPreprocessor:
 
         return df
 
+    def filter_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Filters the dataframe to retain only 'TicketCreatedDate', 'CumulativeDone', and 'CumulativeFlow' columns.
+        Removes duplicate values based on 'TicketCreatedDate'.
+
+        :param df: Input dataframe.
+        :return: Filtered dataframe.
+        """
+        df_filtered = df[['TicketCreatedDate', 'CumulativeDone', 'CumulativeFlow']]
+
+        df_filtered = df_filtered.drop_duplicates(subset='TicketCreatedDate')
+
+        return df_filtered
+
+    def fill_consecutive_dates(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Fills in missing dates in the 'TicketCreatedDate' column with consecutive dates
+        and forward-fills the 'CumulativeDone' and 'CumulativeFlow' columns for the missing dates.
+
+        :param df: Input dataframe.
+        :return: DataFrame with consecutive dates and forward-filled values.
+        """
+
+        df['TicketCreatedDate'] = pd.to_datetime(df['TicketCreatedDate'])
+
+
+        df.set_index('TicketCreatedDate', inplace=True)
+        all_dates = pd.date_range(start=df.index.min(), end=df.index.max())
+        df = df.reindex(all_dates)
+
+
+        df['CumulativeDone'] = df['CumulativeDone'].ffill().astype(int)
+        df['CumulativeFlow'] = df['CumulativeFlow'].ffill().astype(int)
+
+        return df
+
 
 
 

@@ -1,9 +1,16 @@
 from utility import DataPreprocessor
 import settings
 from predictor.plotting import DataPlotter
+import sys
+import os
+
+sys.path.append(os.path.abspath('../../'))
+from generate_fake_data.mocked_up import run_ada
+
 
 
 def main():
+    run_ada.ada_df_generator()
     preprocessor = DataPreprocessor()
     plotter = DataPlotter()
     df = preprocessor.read_data(filename=settings.filename)

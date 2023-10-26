@@ -110,35 +110,7 @@ class DataPreprocessor:
 
 
 
-    def cumulative_flow_per_pi(self, df):
 
-        statuses = ["Refined", "In Progress", "To Do", "In Review"]
-
-
-        if not all(col in df.columns for col in ["PI", "TicketStatus"]):
-            print("Required columns ('PI' or 'TicketStatus') not found in the dataframe")
-            return df
-
-
-        valid_tickets_per_pi = (
-            df[df["TicketStatus"].isin(statuses)]
-            .groupby("PI")
-            .nunique()["TicketName"]
-            .reset_index(name="count_valid_tickets")
-        )
-
-
-        valid_tickets_per_pi["CumulativeFlow"] = valid_tickets_per_pi["count_valid_tickets"].cumsum()
-
-
-        df = df.merge(
-            valid_tickets_per_pi[["PI", "CumulativeFlow"]], on="PI", how="left"
-        )
-
-
-        df["CumulativeFlow"] = df["CumulativeFlow"].ffill().fillna(0).astype(int)
-
-        return df
     #
     # def filter_columns(self, df):
     #     desired_columns = ["PI", "CumulativeDone", "CumulativeFlow"]

@@ -19,7 +19,7 @@ def main():
     ada_projects = [preprocessor.cumulative_flow_per_date(df=project) for project in ada_projects]
     ada_projects = [preprocessor.filter_dataframe(project) for project in ada_projects]
     ada_projects = [preprocessor.fill_consecutive_dates(project) for project in ada_projects]
-    # plotter.plot_projects(ada_projects)
+    plotter.plot_projects(ada_projects=ada_projects, last_n_days=None)
 
     return ada_projects
 

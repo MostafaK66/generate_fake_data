@@ -10,7 +10,7 @@ from mocked_up.ada_df_generator import AdaBottleneckGenerator
 @DecoratorTools.save_to_csv_decorator
 def ada_df_generator() -> Tuple[pd.DataFrame, pd.DataFrame]:
     generator = AdaBottleneckGenerator(
-        n_tickets=1000,
+        n_tickets=5000,
         seed=123,
         progress_rates={
             "ADA_Project_1": 1.0,

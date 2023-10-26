@@ -13,7 +13,7 @@ def ada_df_generator() -> Tuple[pd.DataFrame, pd.DataFrame]:
         n_tickets=5000,
         seed=123,
         progress_rates={
-            "ADA_Project_1": 1.0,
+            "ADA_Project_1": 0.9,
             "ADA_Project_2": 0.8,
             "ADA_Project_3": 0.7,
         },

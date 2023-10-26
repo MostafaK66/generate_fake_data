@@ -12,52 +12,103 @@ class DataPreprocessor:
 
         return pd.read_csv(filename, dtype={"PI": str})
 
-    def process_and_sort(self, df):
+    def split_and_sort(self, df: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
+        """
+        Split the dataframe into three based on TicketProject values and sort by TicketCreatedDate.
 
-        df = df.copy()
+        :param df: Input dataframe.
+        :return: Three dataframes for ADA_Project_1, ADA_Project_2, and ADA_Project_3.
+        """
 
-        if "PI" in df.columns:
-            df["PI"] = pd.to_numeric(df["PI"], errors="coerce")
-            df["PI"] = df["PI"].round(1)
-            df = df.sort_values(by="PI")
-        return df
+        project_names = ['ADA_Project_1', 'ADA_Project_2', 'ADA_Project_3']
+        result_dfs = []
 
-    def split_and_process(self, df):
+        for project in project_names:
+            project_df = df[df['TicketProject'] == project].sort_values(by='TicketCreatedDate')
+            result_dfs.append(project_df)
 
-        ada_project_1 = self.process_and_sort(
-            df[df["TicketProject"] == "ADA_Project_1"]
-        )
-        ada_project_2 = self.process_and_sort(
-            df[df["TicketProject"] == "ADA_Project_2"]
-        )
-        ada_project_3 = self.process_and_sort(
-            df[df["TicketProject"] == "ADA_Project_3"]
-        )
+        return tuple(result_dfs)
 
-        return ada_project_1, ada_project_2, ada_project_3
+    def cumulative_done_per_date(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Calculate the cumulative number of 'Done' tickets based on the TicketCreatedDate.
 
-    def cumulative_done_per_pi(self, df):
-        required_cols = ["PI", "TicketStatus"]
-        if not all(col in df.columns for col in required_cols):
-            print("Required columns ('PI' or 'TicketStatus') not found in the dataframe")
+        :param df: Input dataframe with at least 'TicketStatus' and 'TicketCreatedDate' columns.
+        :return: Dataframe with an additional 'CumulativeDone' column.
+        """
+        required_col = "TicketStatus"
+        if required_col not in df.columns:
+            print(f"Required column ('{required_col}') not found in the dataframe")
             return df
 
-        done_tickets_per_pi = (
+        done_tickets_per_date = (
             df[df["TicketStatus"] == "Done"]
-            .groupby("PI")
+            .groupby("TicketCreatedDate")
             .size()
             .reset_index(name="count_done")
         )
 
-        done_tickets_per_pi["CumulativeDone"] = done_tickets_per_pi["count_done"].cumsum()
+        done_tickets_per_date["CumulativeDone"] = done_tickets_per_date["count_done"].cumsum()
 
         df = df.merge(
-            done_tickets_per_pi[["PI", "CumulativeDone"]], on="PI", how="left"
+            done_tickets_per_date[["TicketCreatedDate", "CumulativeDone"]], on="TicketCreatedDate", how="left"
         )
 
         df["CumulativeDone"] = df["CumulativeDone"].ffill().fillna(0).astype(int)
 
         return df
+
+    def cumulative_flow_per_date(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Calculate the cumulative flow based on the TicketCreatedDate for specific ticket statuses.
+
+        :param df: Input dataframe with at least 'TicketStatus' and 'TicketCreatedDate' columns.
+        :return: Dataframe with an additional 'CumulativeFlow' column.
+        """
+        statuses = ["Refined", "In Progress", "To Do", "In Review"]
+
+        required_col = "TicketStatus"
+        if required_col not in df.columns:
+            print(f"Required column ('{required_col}') not found in the dataframe")
+            return df
+
+        valid_tickets_per_date = (
+            df[df["TicketStatus"].isin(statuses)]
+            .groupby("TicketCreatedDate")
+            .nunique()["TicketName"]
+            .reset_index(name="count_valid_tickets")
+        )
+
+        valid_tickets_per_date["CumulativeFlow"] = valid_tickets_per_date["count_valid_tickets"].cumsum()
+
+        df = df.merge(
+            valid_tickets_per_date[["TicketCreatedDate", "CumulativeFlow"]], on="TicketCreatedDate", how="left"
+        )
+
+        df["CumulativeFlow"] = df["CumulativeFlow"].ffill().fillna(0).astype(int)
+
+        return df
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def cumulative_flow_per_pi(self, df):
 
@@ -88,10 +139,10 @@ class DataPreprocessor:
         df["CumulativeFlow"] = df["CumulativeFlow"].ffill().fillna(0).astype(int)
 
         return df
-
-    def filter_columns(self, df):
-        desired_columns = ["PI", "CumulativeDone", "CumulativeFlow"]
-        return df[desired_columns].drop_duplicates().reset_index(drop=True)
+    #
+    # def filter_columns(self, df):
+    #     desired_columns = ["PI", "CumulativeDone", "CumulativeFlow"]
+    #     return df[desired_columns].drop_duplicates().reset_index(drop=True)
 
 
 

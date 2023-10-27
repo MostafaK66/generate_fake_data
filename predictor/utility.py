@@ -99,7 +99,7 @@ class DataPreprocessor:
         :param df: Input dataframe.
         :return: Filtered dataframe.
         """
-        df_filtered = df[["PI", 'TicketCreatedDate', "DoneTicketsCount", "FlowTicketCount"]]
+        df_filtered = df[['TicketCreatedDate', "DoneTicketsCount", "FlowTicketCount"]]
 
         df_filtered = df_filtered.drop_duplicates(subset='TicketCreatedDate')
 
@@ -122,8 +122,8 @@ class DataPreprocessor:
         df = df.reindex(all_dates)
 
 
-        df['CumulativeDone'] = df['CumulativeDone'].ffill().astype(int)
-        df['CumulativeFlow'] = df['CumulativeFlow'].ffill().astype(int)
+        df['DoneTicketsCount'] = df['DoneTicketsCount'].ffill().astype(int)
+        df['FlowTicketCount'] = df['FlowTicketCount'].ffill().astype(int)
 
         return df
 

@@ -78,7 +78,7 @@ class DataPreprocessor:
             df[df["TicketStatus"].isin(statuses)]
             .groupby("TicketCreatedDate")
             .nunique()["TicketName"]
-            .reset_index(name="FlowTicketCount")
+            .reset_index(name="FlowTicketsCount")
         )
 
 
@@ -87,7 +87,7 @@ class DataPreprocessor:
         )
 
 
-        df["FlowTicketCount"] = df["FlowTicketCount"].fillna(0).astype(int)
+        df["FlowTicketsCount"] = df["FlowTicketsCount"].fillna(0).astype(int)
 
         return df
 
@@ -99,7 +99,7 @@ class DataPreprocessor:
         :param df: Input dataframe.
         :return: Filtered dataframe.
         """
-        df_filtered = df[['TicketCreatedDate', "DoneTicketsCount", "FlowTicketCount"]]
+        df_filtered = df[['TicketCreatedDate', "DoneTicketsCount", "FlowTicketsCount"]]
 
         df_filtered = df_filtered.drop_duplicates(subset='TicketCreatedDate')
 
@@ -123,7 +123,7 @@ class DataPreprocessor:
 
 
         df['DoneTicketsCount'] = df['DoneTicketsCount'].ffill().astype(int)
-        df['FlowTicketCount'] = df['FlowTicketCount'].ffill().astype(int)
+        df['FlowTicketsCount'] = df['FlowTicketsCount'].ffill().astype(int)
 
         return df
 

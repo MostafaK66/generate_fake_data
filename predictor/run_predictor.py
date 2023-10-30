@@ -3,7 +3,7 @@ import settings
 from predictor.plotting import DataPlotter
 import sys
 import os
-
+import pandas as pd
 sys.path.append(os.path.abspath('../../'))
 from generate_fake_data.mocked_up import run_ada
 
@@ -19,9 +19,10 @@ def main():
     ada_projects = [preprocessor.flow_per_date(df=project) for project in ada_projects]
     ada_projects = [preprocessor.filter_dataframe(project) for project in ada_projects]
     ada_projects = [preprocessor.fill_consecutive_dates(project) for project in ada_projects]
-    plotter.plot_projects(ada_projects=ada_projects, last_n_days=None)
+    plotter.plot_projects(ada_projects=ada_projects, last_n_days=21)
+    transformed_df = preprocessor.series_to_supervised(ada_projects)
 
-    return ada_projects
+    return transformed_df
 
 
 if __name__ == "__main__":

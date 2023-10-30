@@ -1,5 +1,6 @@
 from pathlib import Path
 import pandas as pd
+from typing import Union, List
 
 
 class DataPreprocessor:
@@ -126,6 +127,32 @@ class DataPreprocessor:
         df['FlowTicketsCount'] = df['FlowTicketsCount'].ffill().astype(int)
 
         return df
+
+    @staticmethod
+    def series_to_supervised(data: Union[List[float], pd.DataFrame],
+                             n_in: int = 1,
+                             n_out: int = 1,
+                             dropnan: bool = True) -> pd.DataFrame:
+
+        if isinstance(data, list):
+            data = pd.DataFrame(data)
+        elif isinstance(data, pd.Series):
+            data = data.to_frame()
+
+        cols = []
+        for name, col in data.items():
+            col_df = pd.DataFrame(col)
+            for i in range(n_in, 0, -1):
+                cols.append(col_df.shift(i).rename(columns={name: f'{name}(t-{i})'}))
+            for i in range(0, n_out):
+                cols.append(col_df.shift(-i).rename(columns={name: f'{name}(t+{i})'}))
+
+        agg = pd.concat(cols, axis=1)
+        if dropnan:
+            agg.dropna(inplace=True)
+
+        return agg
+
 
 
 

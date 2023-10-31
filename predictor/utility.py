@@ -129,6 +129,18 @@ class DataPreprocessor:
         return df
 
     def series_to_supervised(self, series, n_in, n_out, dropnan=True):
+        """
+        Convert a time series into a supervised learning dataset.
+
+        Parameters:
+        - series (pd.Series): The input time series data.
+        - n_in (int): Number of lag observations as input (X).
+        - n_out (int): Number of observations as output (y).
+        - dropnan (bool): Whether to drop rows with NaN values, default is True.
+
+        Returns:
+        - array: An array representation of the transformed dataset.
+        """
         df = pd.DataFrame(series)
         cols = list()
         for i in range(n_in, 0, -1):
@@ -140,14 +152,25 @@ class DataPreprocessor:
             agg.dropna(inplace=True)
         return agg.values
 
-
-
     def process_dataframe_series(self, dataframes, col_idx, n_in, n_out):
+        """
+        Process a list of dataframes to transform a specified column into a supervised learning dataset.
+
+        Parameters:
+        - dataframes (list of pd.DataFrame): List of input dataframes.
+        - col_idx (int): Index of the column to process.
+        - n_in (int): Number of lag observations as input (X).
+        - n_out (int): Number of observations as output (y).
+
+        Returns:
+        - list: A list containing arrays of transformed data for each dataframe.
+        """
         transformed_data = []
         for df in dataframes:
             series = df.iloc[:, col_idx]
             transformed_data.append(self.series_to_supervised(series, n_in=n_in, n_out=n_out))
         return transformed_data
+
 
 
 

@@ -140,10 +140,12 @@ class DataPreprocessor:
             agg.dropna(inplace=True)
         return agg.values
 
-    def process_dataframe_series(self, dataframes, n_in, n_out):
+
+
+    def process_dataframe_series(self, dataframes, col_idx, n_in, n_out):
         transformed_data = []
         for df in dataframes:
-            series = df.iloc[:, 1]
+            series = df.iloc[:, col_idx]
             transformed_data.append(self.series_to_supervised(series, n_in=n_in, n_out=n_out))
         return transformed_data
 

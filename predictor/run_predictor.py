@@ -20,15 +20,23 @@ def main():
     ada_projects = [preprocessor.filter_dataframe(project) for project in ada_projects]
     ada_projects = [preprocessor.fill_consecutive_dates(project) for project in ada_projects]
     plotter.plot_projects(ada_projects=ada_projects, last_n_days=21)
-    transformed_dfs = preprocessor.process_dataframe_series(ada_projects, n_in=settings.N_IN, n_out=settings.N_OUT)
+
+    all_transformed_dfs = []
+
+    for col_idx in [0, 1]:
+        transformed_dfs = preprocessor.process_dataframe_series(ada_projects, col_idx, n_in=settings.N_IN,
+                                                                n_out=settings.N_OUT)
+        all_transformed_dfs.append(transformed_dfs)
+
+    return ada_projects, all_transformed_dfs
 
 
-    return ada_projects, transformed_dfs
 
 
 if __name__ == "__main__":
-    ada_projects, transformed_dfs = main()
+    ada_projects, all_transformed_dfs = main()
     df1, df2, df3 = ada_projects
-    ar1, ar2, ar3 = transformed_dfs
+    ar1_col1, ar2_col1, ar3_col1 = all_transformed_dfs[0]
+    ar1_col2, ar2_col2, ar3_col2 = all_transformed_dfs[1]
     print("yes")
 

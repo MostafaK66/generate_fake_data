@@ -20,7 +20,7 @@ def main():
     ada_projects = [preprocessor.filter_dataframe(project) for project in ada_projects]
     ada_projects = [preprocessor.fill_consecutive_dates(project) for project in ada_projects]
     plotter.plot_projects(ada_projects=ada_projects, last_n_days=21)
-    transformed_dfs = preprocessor.process_dataframe_series(ada_projects)
+    transformed_dfs = preprocessor.process_dataframe_series(ada_projects, n_in=settings.N_IN, n_out=settings.N_OUT)
 
 
     return ada_projects, transformed_dfs

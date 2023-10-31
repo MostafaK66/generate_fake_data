@@ -128,7 +128,7 @@ class DataPreprocessor:
 
         return df
 
-    def series_to_supervised(self, series, n_in=1, n_out=1, dropnan=True):
+    def series_to_supervised(self, series, n_in, n_out, dropnan=True):
         df = pd.DataFrame(series)
         cols = list()
         for i in range(n_in, 0, -1):
@@ -140,12 +140,15 @@ class DataPreprocessor:
             agg.dropna(inplace=True)
         return agg.values
 
-    def process_dataframe_series(self, dataframes):
+    def process_dataframe_series(self, dataframes, n_in, n_out):
         transformed_data = []
         for df in dataframes:
             series = df.iloc[:, 1]
-            transformed_data.append(self.series_to_supervised(series, n_in=1, n_out=1))
+            transformed_data.append(self.series_to_supervised(series, n_in=n_in, n_out=n_out))
         return transformed_data
+
+
+
 
 
 

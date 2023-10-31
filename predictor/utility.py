@@ -1,7 +1,7 @@
 from pathlib import Path
 import pandas as pd
 from typing import Union, List
-
+import numpy as np
 
 class DataPreprocessor:
     def __init__(self):
@@ -128,30 +128,29 @@ class DataPreprocessor:
 
         return df
 
-    @staticmethod
-    def series_to_supervised(data: Union[List[float], pd.DataFrame],
-                             n_in: int = 1,
-                             n_out: int = 1,
-                             dropnan: bool = True) -> pd.DataFrame:
-
-        if isinstance(data, list):
-            data = pd.DataFrame(data)
-        elif isinstance(data, pd.Series):
-            data = data.to_frame()
-
-        cols = []
-        for name, col in data.items():
-            col_df = pd.DataFrame(col)
-            for i in range(n_in, 0, -1):
-                cols.append(col_df.shift(i).rename(columns={name: f'{name}(t-{i})'}))
-            for i in range(0, n_out):
-                cols.append(col_df.shift(-i).rename(columns={name: f'{name}(t+{i})'}))
-
+    def series_to_supervised(self, series, n_in=1, n_out=1, dropnan=True):
+        df = pd.DataFrame(series)
+        cols = list()
+        for i in range(n_in, 0, -1):
+            cols.append(df.shift(i))
+        for i in range(0, n_out):
+            cols.append(df.shift(-i))
         agg = pd.concat(cols, axis=1)
         if dropnan:
             agg.dropna(inplace=True)
+        return agg.values
 
-        return agg
+    def process_dataframe_series(self, dataframes):
+        transformed_data = []
+        for df in dataframes:
+            series = df.iloc[:, 1]
+            transformed_data.append(self.series_to_supervised(series, n_in=1, n_out=1))
+        return transformed_data
+
+
+
+
+
 
 
 

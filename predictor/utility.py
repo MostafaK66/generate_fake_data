@@ -4,8 +4,8 @@ from typing import Union, List
 import numpy as np
 
 class DataPreprocessor:
-    def __init__(self):
-        pass
+    def __init__(self, split_ratio):
+        self.split_ratio = split_ratio
 
     def read_data(self, filename):
 
@@ -170,6 +170,17 @@ class DataPreprocessor:
             series = df.iloc[:, col_idx]
             transformed_data.append(self.series_to_supervised(series, n_in=n_in, n_out=n_out))
         return transformed_data
+
+    def train_test_split(self, series: pd.Series):
+        """
+        Splits a series into training and testing sets based on a specified split ratio.
+
+        :param series: pd.Series, the input series to be split.
+        :return: a tuple containing the training and testing Series.
+        """
+        train_size = int(len(series) * self.split_ratio)
+        train, test = series[:train_size], series[train_size:]
+        return train, test
 
 
 

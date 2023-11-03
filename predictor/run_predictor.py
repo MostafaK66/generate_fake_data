@@ -1,18 +1,20 @@
 from utility import DataPreprocessor
 import settings
 from predictor.plotting import DataPlotter
+from sequence_predictor import UnivarientSequencePredictor
 import sys
 import os
 import pandas as pd
+
 sys.path.append(os.path.abspath('../../'))
 from generate_fake_data.mocked_up import run_ada
-
-
 
 def main():
     run_ada.ada_df_generator()
     preprocessor = DataPreprocessor(split_ratio=settings.SPLIT_RATIO)
+    predictor = UnivarientSequencePredictor()
     plotter = DataPlotter()
+
     df = preprocessor.read_data(filename=settings.filename)
     ada_projects = preprocessor.split_and_sort(df=df)
     ada_projects = [preprocessor.done_tickets_per_date(df=project) for project in ada_projects]
@@ -32,18 +34,47 @@ def main():
         train_test_splits = [preprocessor.train_test_split(data) for data in transformed_dfs]
         all_train_test_splits.append(train_test_splits)
 
-    return ada_projects, all_train_test_splits
+    walk_forward_validation_results = {}
+    col_names = ["col1", "col2"]
+    for col_idx, train_test_splits in enumerate(all_train_test_splits):
+        for df_idx, split in enumerate(train_test_splits):
+            train, test = split
+            result = predictor.walk_forward_validation(train, test)
+            key = f"splits_{col_names[col_idx]}_df{df_idx + 1}"
+            walk_forward_validation_results[key] = result
 
-
-
-
+    return ada_projects, all_train_test_splits, walk_forward_validation_results
 
 if __name__ == "__main__":
-    ada_projects, all_train_test_splits  = main()
+    ada_projects, all_train_test_splits, walk_forward_validation_results = main()
     df1, df2, df3 = ada_projects
+    splits_col1_df1, splits_col1_df2, splits_col1_df3 = all_train_test_splits[0]
+    splits_col2_df1, splits_col2_df2, splits_col2_df3 = all_train_test_splits[1]
+    result_splits_col1_df1 = walk_forward_validation_results['splits_col1_df1']
+    result_splits_col1_df2 = walk_forward_validation_results['splits_col1_df2']
+    result_splits_col1_df3 = walk_forward_validation_results['splits_col1_df3']
+    result_splits_col2_df1 = walk_forward_validation_results['splits_col2_df1']
+    result_splits_col2_df2 = walk_forward_validation_results['splits_col2_df2']
+    result_splits_col2_df3 = walk_forward_validation_results['splits_col2_df3']
+
+    print("Results for splits_col1_df1:", result_splits_col1_df1)
+
+
+
+
+
+
+
+
+
+
+#
+# if __name__ == "__main__":
+#     ada_projects, all_train_test_splits  = main()
+#     df1, df2, df3 = ada_projects
     splits_col1_df1, splits_col1_df2, splits_col1_df3 = all_train_test_splits[0]
     splits_col2_df1, splits_col2_df2, splits_col2_df3 = all_train_test_splits[1]
 
 
-    print("yes")
+
 

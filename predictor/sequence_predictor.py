@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 from numpy import asarray
+import pandas as pd
 
 class UnivarientSequencePredictor:
 
@@ -21,7 +22,7 @@ class UnivarientSequencePredictor:
         """
         train = asarray(train)
         trainX, trainy = train[:, :-1], train[:, -1]
-        model = RandomForestRegressor(n_estimators=1000)
+        model = RandomForestRegressor(n_estimators=5)
         model.fit(trainX, trainy)
         yhat = model.predict([testX])
         return yhat[0]

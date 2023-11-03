@@ -49,9 +49,11 @@ class UnivarientSequencePredictor:
             predictions.append(yhat)
             actuals.append(testy)
             history.append(test[i])
-        error = mean_absolute_error(actuals, predictions)
+
+        mean_absolute_error_value = mean_absolute_error(actuals, predictions)
 
         results_df = pd.DataFrame({'Actual': actuals, 'Predicted': predictions})
 
-        return error, results_df
+        return mean_absolute_error_value, results_df
+
 

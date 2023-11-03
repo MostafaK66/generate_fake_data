@@ -37,16 +37,21 @@ class UnivarientSequencePredictor:
 
         Returns:
             float: The Mean Absolute Error between predictions and actuals.
-            array-like: The actual target values.
-            list: The predicted target values.
+            DataFrame: A DataFrame containing columns 'Actual' and 'Predicted' for test data.
         """
         predictions = list()
+        actuals = list()
         history = [x for x in train]
+
         for i in range(len(test)):
             testX, testy = test[i, :-1], test[i, -1]
             yhat = self.univarient_predictor(history, testX)
             predictions.append(yhat)
+            actuals.append(testy)
             history.append(test[i])
-        error = mean_absolute_error(test[:, -1], predictions)
-        return error, test[:, -1], predictions
+        error = mean_absolute_error(actuals, predictions)
+
+        results_df = pd.DataFrame({'Actual': actuals, 'Predicted': predictions})
+
+        return error, results_df
 

@@ -64,17 +64,3 @@ if __name__ == "__main__":
 
 
 
-
-
-
-
-#
-# if __name__ == "__main__":
-#     ada_projects, all_train_test_splits  = main()
-#     df1, df2, df3 = ada_projects
-    splits_col1_df1, splits_col1_df2, splits_col1_df3 = all_train_test_splits[0]
-    splits_col2_df1, splits_col2_df2, splits_col2_df3 = all_train_test_splits[1]
-
-
-
-

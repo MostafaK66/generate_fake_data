@@ -26,12 +26,11 @@ class UnivarientSequencePredictor:
         yhat = model.predict([testX])
         return yhat[0]
 
-    def walk_forward_validation(self, data, train, test):
+    def walk_forward_validation(self,train, test):
         """
         Conducts walk forward validation, fitting the model and making predictions step-by-step.
 
         Args:
-            data (array-like): The complete dataset.
             train (array-like): The training dataset.
             test (array-like): The test dataset.
 

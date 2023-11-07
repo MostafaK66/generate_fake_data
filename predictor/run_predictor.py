@@ -13,7 +13,7 @@ from generate_fake_data.mocked_up import run_ada
 def main():
     run_ada.ada_df_generator()
     preprocessor = DataPreprocessor(split_ratio=settings.SPLIT_RATIO)
-    predictor = UnivarientSequencePredictor(param_grid=settings.RF_PARAM_GRID)
+    predictor = UnivarientSequencePredictor(param_grid=settings.RF_PARAM_GRID, time_series_split_ratio=settings.TIME_SERIES_SPLIT_RATIO)
     plotter = DataPlotter()
     walk_forward_validation_results = {}
     col_names = ["PredictedDone", "PredictedFlow"]

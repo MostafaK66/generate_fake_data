@@ -10,8 +10,9 @@ from sklearn.model_selection import TimeSeriesSplit
 
 class UnivarientSequencePredictor:
 
-    def __init__(self, param_grid):
+    def __init__(self, param_grid, time_series_split_ratio):
         self.param_grid = param_grid
+        self.time_series_split_ratio = time_series_split_ratio
 
     def univarient_predictor(self, train, testX):
         """
@@ -26,7 +27,7 @@ class UnivarientSequencePredictor:
         """
         train = asarray(train)
         trainX, trainy = train[:, :-1], train[:, -1]
-        RF = GridSearchCV(estimator=RandomForestRegressor(random_state=123), param_grid=self.param_grid, cv=TimeSeriesSplit(n_splits=3))
+        RF = GridSearchCV(estimator=RandomForestRegressor(random_state=123), param_grid=self.param_grid, cv=TimeSeriesSplit(n_splits=self.time_series_split_ratio))
         RF.fit(trainX, trainy)
         best_model = RF.best_estimator_
         yhat = best_model.predict([testX])

@@ -1,10 +1,12 @@
-from utility import DataPreprocessor
-import settings
-from predictor.plotting import DataPlotter
-from sequence_predictor import UnivarientSequencePredictor
-import sys
 import os
+import sys
+
 import pandas as pd
+import settings
+from sequence_predictor import UnivarientSequencePredictor
+from utility import DataPreprocessor
+
+from predictor.plotting import DataPlotter
 
 sys.path.append(os.path.abspath("../../"))
 from generate_fake_data.mocked_up import run_ada
@@ -13,7 +15,10 @@ from generate_fake_data.mocked_up import run_ada
 def main():
     run_ada.ada_df_generator()
     preprocessor = DataPreprocessor(split_ratio=settings.SPLIT_RATIO)
-    predictor = UnivarientSequencePredictor(param_grid=settings.RF_PARAM_GRID, time_series_split_ratio=settings.TIME_SERIES_SPLIT_RATIO)
+    predictor = UnivarientSequencePredictor(
+        param_grid=settings.RF_PARAM_GRID,
+        time_series_split_ratio=settings.TIME_SERIES_SPLIT_RATIO,
+    )
     plotter = DataPlotter()
     walk_forward_validation_results = {}
     col_names = ["PredictedDone", "PredictedFlow"]
@@ -49,20 +54,42 @@ def main():
     for col_idx, train_test_splits in enumerate(all_train_test_splits):
         for df_idx, split in enumerate(train_test_splits):
             train, test = split
-            mae, results_df, best_params = predictor.walk_forward_validation(train, test)
+            mae, results_df, best_params = predictor.walk_forward_validation(
+                train, test
+            )
             key = f"splits_{col_names[col_idx]}_df{df_idx + 1}"
-            walk_forward_validation_results[key] = {'MAE': mae, 'ResultsDF': results_df}
+            walk_forward_validation_results[key] = {"MAE": mae, "ResultsDF": results_df}
             best_params_dict[key] = best_params
             mae_dict[key] = mae
 
-    return ada_projects, all_train_test_splits, walk_forward_validation_results, best_params_dict, mae_dict
+    return (
+        ada_projects,
+        all_train_test_splits,
+        walk_forward_validation_results,
+        best_params_dict,
+        mae_dict,
+    )
 
 
 if __name__ == "__main__":
-    ada_projects, all_train_test_splits, walk_forward_validation_results, best_params_dict, mae_dict = main()
+    (
+        ada_projects,
+        all_train_test_splits,
+        walk_forward_validation_results,
+        best_params_dict,
+        mae_dict,
+    ) = main()
     df1, df2, df3 = ada_projects
-    splits_PredictedDone_df1, splits_PredictedDone_df2, splits_PredictedDone_df3 = all_train_test_splits[0]
-    splits_PredictedFlow_df1, splits_PredictedFlow_df2, splits_PredictedFlow_df3 = all_train_test_splits[1]
+    (
+        splits_PredictedDone_df1,
+        splits_PredictedDone_df2,
+        splits_PredictedDone_df3,
+    ) = all_train_test_splits[0]
+    (
+        splits_PredictedFlow_df1,
+        splits_PredictedFlow_df2,
+        splits_PredictedFlow_df3,
+    ) = all_train_test_splits[1]
     result_splits_PredictedDone_df1 = walk_forward_validation_results[
         "splits_PredictedDone_df1"
     ]

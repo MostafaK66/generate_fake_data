@@ -17,7 +17,6 @@ class DataPlotter:
 
         for idx, project in enumerate(ada_projects):
             ax_done = axs[idx * 2]
-
             ax_flow = axs[idx * 2 + 1]
 
             if last_n_days:
@@ -27,17 +26,32 @@ class DataPlotter:
                     (project.index >= start_date) & (project.index <= end_date)
                 ]
 
+            split_idx = int(len(project) * 0.8)
+
             ax_done.plot(
-                project.index,
-                project["DoneTicketsCount"],
-                label="DoneTicketsCount",
+                project.index[:split_idx],
+                project["DoneTicketsCount"][:split_idx],
+                label="DoneTicketsCount (Train)",
                 color="blue",
             )
+            ax_done.plot(
+                project.index[split_idx:],
+                project["DoneTicketsCount"][split_idx:],
+                label="DoneTicketsCount (Test)",
+                color="green",
+            )
+
             ax_flow.plot(
-                project.index,
-                project["FlowTicketsCount"],
-                label="FlowTicketsCount",
+                project.index[:split_idx],
+                project["FlowTicketsCount"][:split_idx],
+                label="FlowTicketsCount (Train)",
                 color="orange",
+            )
+            ax_flow.plot(
+                project.index[split_idx:],
+                project["FlowTicketsCount"][split_idx:],
+                label="FlowTicketsCount (Test)",
+                color="pink",
             )
 
             ax_done.set_title(f"ada_project_{idx + 1} Done Tickets")

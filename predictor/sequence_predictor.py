@@ -7,10 +7,11 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import TimeSeriesSplit
 
 
+
 class UnivarientSequencePredictor:
 
-    def __init__(self):
-        pass
+    def __init__(self, param_grid):
+        self.param_grid = param_grid
 
     def univarient_predictor(self, train, testX):
         """
@@ -25,8 +26,7 @@ class UnivarientSequencePredictor:
         """
         train = asarray(train)
         trainX, trainy = train[:, :-1], train[:, -1]
-        param_grid = {"n_estimators": [1, 2, 3]}
-        RF = GridSearchCV(estimator=RandomForestRegressor(random_state=123), param_grid=param_grid, cv=TimeSeriesSplit(n_splits=3))
+        RF = GridSearchCV(estimator=RandomForestRegressor(random_state=123), param_grid=self.param_grid, cv=TimeSeriesSplit(n_splits=3))
         RF.fit(trainX, trainy)
         best_model = RF.best_estimator_
         yhat = best_model.predict([testX])

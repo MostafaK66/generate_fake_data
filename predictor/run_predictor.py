@@ -35,7 +35,7 @@ def main():
         all_train_test_splits.append(train_test_splits)
 
     walk_forward_validation_results = {}
-    col_names = ["col1", "col2"]
+    col_names = ["PredictedDone", "PredictedFlow"]
     for col_idx, train_test_splits in enumerate(all_train_test_splits):
         for df_idx, split in enumerate(train_test_splits):
             train, test = split
@@ -50,12 +50,13 @@ if __name__ == "__main__":
     df1, df2, df3 = ada_projects
     splits_col1_df1, splits_col1_df2, splits_col1_df3 = all_train_test_splits[0]
     splits_col2_df1, splits_col2_df2, splits_col2_df3 = all_train_test_splits[1]
-    result_splits_col1_df1 = walk_forward_validation_results['splits_col1_df1']
-    result_splits_col1_df2 = walk_forward_validation_results['splits_col1_df2']
-    result_splits_col1_df3 = walk_forward_validation_results['splits_col1_df3']
-    result_splits_col2_df1 = walk_forward_validation_results['splits_col2_df1']
-    result_splits_col2_df2 = walk_forward_validation_results['splits_col2_df2']
-    result_splits_col2_df3 = walk_forward_validation_results['splits_col2_df3']
+    a, b = splits_col1_df1
+    result_splits_PredictedDone_df1 = walk_forward_validation_results['splits_PredictedDone_df1']
+    result_splits_PredictedDone_df2 = walk_forward_validation_results['splits_PredictedDone_df2']
+    result_splits_PredictedDone_df3 = walk_forward_validation_results['splits_PredictedDone_df3']
+    result_splits_PredictedFlow_df1 = walk_forward_validation_results['splits_PredictedFlow_df1']
+    result_splits_PredictedFlow_df2 = walk_forward_validation_results['splits_PredictedFlow_df2']
+    result_splits_PredictedFlow_df3 = walk_forward_validation_results['splits_PredictedFlow_df3']
 
     print("Results for splits_col1_df1:", result_splits_col1_df1)
 

@@ -18,6 +18,7 @@ def main():
     walk_forward_validation_results = {}
     col_names = ["PredictedDone", "PredictedFlow"]
     best_params_dict = {}
+    mae_dict = {}
 
     df = preprocessor.read_data(filename=settings.filename)
     ada_projects = preprocessor.split_and_sort(df=df)
@@ -52,12 +53,13 @@ def main():
             key = f"splits_{col_names[col_idx]}_df{df_idx + 1}"
             walk_forward_validation_results[key] = {'MAE': mae, 'ResultsDF': results_df}
             best_params_dict[key] = best_params
+            mae_dict[key] = mae
 
-    return ada_projects, all_train_test_splits, walk_forward_validation_results, best_params_dict
+    return ada_projects, all_train_test_splits, walk_forward_validation_results, best_params_dict, mae_dict
 
 
 if __name__ == "__main__":
-    ada_projects, all_train_test_splits, walk_forward_validation_results, best_params_dict = main()
+    ada_projects, all_train_test_splits, walk_forward_validation_results, best_params_dict, mae_dict = main()
     df1, df2, df3 = ada_projects
     splits_PredictedDone_df1, splits_PredictedDone_df2, splits_PredictedDone_df3 = all_train_test_splits[0]
     splits_PredictedFlow_df1, splits_PredictedFlow_df2, splits_PredictedFlow_df3 = all_train_test_splits[1]
@@ -80,4 +82,5 @@ if __name__ == "__main__":
         "splits_PredictedFlow_df3"
     ]
 
-    print(best_params_dict)
+    print(f"best parameters: {best_params_dict}")
+    print(f"calculated MAE: {mae_dict}")

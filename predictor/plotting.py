@@ -71,3 +71,34 @@ class DataPlotter:
         plt.tight_layout()
         plt.savefig(os.path.join(self.output_dir, "projects_plot.png"))
         plt.close(fig)
+
+    def plot_actual_vs_predicted(self, walk_forward_validation_results):
+        for key, value in walk_forward_validation_results.items():
+            results_df = value["ResultsDF"]
+
+            plt.figure(figsize=(10, 5))
+
+            plt.plot(results_df["Actual"], label="Actual", color="blue", marker="o")
+
+            plt.plot(
+                results_df["Predicted"],
+                label="Predicted",
+                color="red",
+                linestyle="--",
+                marker="x",
+            )
+
+            plt.title(f"Actual vs Predicted - {key}")
+
+            plt.legend()
+
+            plt.xlabel("Index")
+            plt.ylabel("Ticket Count")
+
+            plt.grid(True)
+
+            plot_path = os.path.join(self.output_dir, f"{key}_actual_vs_predicted.png")
+
+            plt.savefig(plot_path)
+
+            plt.close()

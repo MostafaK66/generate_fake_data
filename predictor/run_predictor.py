@@ -62,6 +62,10 @@ def main():
             best_params_dict[key] = best_params
             mae_dict[key] = mae
 
+    plotter.plot_actual_vs_predicted(
+        walk_forward_validation_results=walk_forward_validation_results
+    )
+
     return (
         ada_projects,
         all_train_test_splits,

@@ -51,7 +51,7 @@ class DataPlotter:
                 project.index[split_idx:],
                 project["FlowTicketsCount"][split_idx:],
                 label="FlowTicketsCount (Test)",
-                color="pink",
+                color="red",
             )
 
             ax_done.set_title(f"ada_project_{idx + 1} Done Tickets")

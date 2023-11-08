@@ -41,7 +41,9 @@ def main():
     ada_projects = [
         preprocessor.fill_consecutive_dates(project) for project in ada_projects
     ]
-    plotter.plot_projects(ada_projects=ada_projects, last_n_days=None)
+    plotter.plot_projects(
+        ada_projects=ada_projects, split_ratio=settings.SPLIT_RATIO, last_n_days=None
+    )
 
     all_transformed_dfs = []
     for col_idx in tqdm(
@@ -83,6 +85,7 @@ def main():
         walk_forward_validation_results=walk_forward_validation_results,
         split_ratio=settings.SPLIT_RATIO,
         n_in=settings.N_IN,
+        last_n_days=None,
     )
     end_time = time.time()
     total_time = end_time - start_time

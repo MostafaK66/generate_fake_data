@@ -12,7 +12,7 @@ class DataPlotter:
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
 
-    def plot_projects(self, ada_projects, last_n_days=None):
+    def plot_projects(self, ada_projects, split_ratio, last_n_days=None):
         fig, axs = plt.subplots(len(ada_projects) * 2, 1, figsize=(10, 15), sharex=True)
 
         for idx, project in enumerate(ada_projects):
@@ -26,7 +26,7 @@ class DataPlotter:
                     (project.index >= start_date) & (project.index <= end_date)
                 ]
 
-            split_idx = int(len(project) * 0.8)
+            split_idx = int(len(project) * split_ratio)
 
             ax_done.plot(
                 project.index[:split_idx],
@@ -72,8 +72,61 @@ class DataPlotter:
         plt.savefig(os.path.join(self.output_dir, "projects_plot.png"))
         plt.close(fig)
 
+    # def plot_actual_vs_predicted(
+    #     self, ada_projects, walk_forward_validation_results, split_ratio, n_in
+    # ):
+    #     for key, value in walk_forward_validation_results.items():
+    #         results_df = value["ResultsDF"]
+    #
+    #         project_number = int(key.split("_")[-1].replace("df", "")) - 1
+    #         project_df = ada_projects[project_number]
+    #
+    #         split_idx = int(len(project_df) * split_ratio)
+    #
+    #         test_timestamps = project_df.index[split_idx + n_in :]
+    #         if len(test_timestamps) != len(results_df):
+    #             min_length = min(len(test_timestamps), len(results_df))
+    #             results_df = results_df.iloc[:min_length]
+    #             test_timestamps = test_timestamps[:min_length]
+    #
+    #         results_df.set_index(test_timestamps, inplace=True)
+    #
+    #         plt.figure(figsize=(10, 5))
+    #
+    #         plt.plot(
+    #             results_df.index,
+    #             results_df["Actual"],
+    #             label="Actual (Test)",
+    #             color="blue",
+    #             marker="o",
+    #         )
+    #         plt.plot(
+    #             results_df.index,
+    #             results_df["Predicted"],
+    #             label="Predicted (Test)",
+    #             color="red",
+    #             linestyle="--",
+    #             marker="x",
+    #         )
+    #
+    #         plt.title(f"Actual vs Predicted - {key}")
+    #         plt.legend()
+    #         plt.xlabel("Date")
+    #         plt.ylabel("Ticket Count")
+    #         plt.grid(True)
+    #         plt.xticks(rotation=15)
+    #
+    #         plot_path = os.path.join(self.output_dir, f"{key}_actual_vs_predicted.png")
+    #         plt.savefig(plot_path)
+    #         plt.close()
+
     def plot_actual_vs_predicted(
-        self, ada_projects, walk_forward_validation_results, split_ratio, n_in
+        self,
+        ada_projects,
+        walk_forward_validation_results,
+        split_ratio,
+        n_in,
+        last_n_days=None,
     ):
         for key, value in walk_forward_validation_results.items():
             results_df = value["ResultsDF"]
@@ -83,7 +136,23 @@ class DataPlotter:
 
             split_idx = int(len(project_df) * split_ratio)
 
+            end_date = (
+                pd.Timestamp.now() if last_n_days is None else project_df.index[-1]
+            )
+            start_date = (
+                end_date - pd.Timedelta(days=last_n_days)
+                if last_n_days
+                else project_df.index[0]
+            )
+
+            project_df = project_df[
+                (project_df.index >= start_date) & (project_df.index <= end_date)
+            ]
+
+            split_idx = int(len(project_df) * split_ratio)
+
             test_timestamps = project_df.index[split_idx + n_in :]
+
             if len(test_timestamps) != len(results_df):
                 min_length = min(len(test_timestamps), len(results_df))
                 results_df = results_df.iloc[:min_length]

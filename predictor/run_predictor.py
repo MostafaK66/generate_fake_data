@@ -4,6 +4,7 @@ import sys
 import pandas as pd
 import settings
 from sequence_predictor import UnivarientSequencePredictor
+from tqdm import tqdm
 from utility import DataPreprocessor
 
 from predictor.plotting import DataPlotter
@@ -38,19 +39,25 @@ def main():
     plotter.plot_projects(ada_projects=ada_projects, last_n_days=None)
 
     all_transformed_dfs = []
-    for col_idx in [0, 1]:
+    for col_idx in tqdm(
+        [0, 1], desc="Transforming columns to seupervised learning sequence"
+    ):
         transformed_dfs = preprocessor.process_dataframe_series(
             ada_projects, col_idx, n_in=settings.N_IN, n_out=settings.N_OUT
         )
         all_transformed_dfs.append(transformed_dfs)
 
     all_train_test_splits = []
-    for transformed_dfs in all_transformed_dfs:
+    for transformed_dfs in tqdm(
+        all_transformed_dfs, desc="Splitting train and test data"
+    ):
         train_test_splits = [
             preprocessor.train_test_split(data) for data in transformed_dfs
         ]
         all_train_test_splits.append(train_test_splits)
 
+    total_iterations = sum(len(splits) for splits in all_train_test_splits)
+    progress_bar = tqdm(total=total_iterations, desc="Running walk forward validation")
     for col_idx, train_test_splits in enumerate(all_train_test_splits):
         for df_idx, split in enumerate(train_test_splits):
             train, test = split
@@ -61,6 +68,10 @@ def main():
             walk_forward_validation_results[key] = {"MAE": mae, "ResultsDF": results_df}
             best_params_dict[key] = best_params
             mae_dict[key] = mae
+
+            progress_bar.update(1)
+
+    progress_bar.close()
 
     plotter.plot_actual_vs_predicted(
         walk_forward_validation_results=walk_forward_validation_results

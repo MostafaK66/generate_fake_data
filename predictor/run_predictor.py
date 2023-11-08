@@ -1,5 +1,9 @@
+import logging
+
+logging.basicConfig(level=logging.WARNING)
 import os
 import sys
+import time
 
 import pandas as pd
 import settings
@@ -14,6 +18,7 @@ from generate_fake_data.mocked_up import run_ada
 
 
 def main():
+    start_time = time.time()
     run_ada.ada_df_generator()
     preprocessor = DataPreprocessor(split_ratio=settings.SPLIT_RATIO)
     predictor = UnivarientSequencePredictor(
@@ -76,6 +81,9 @@ def main():
     plotter.plot_actual_vs_predicted(
         walk_forward_validation_results=walk_forward_validation_results
     )
+    end_time = time.time()
+    total_time = end_time - start_time
+    print(f"Total running time ML pipeline: {total_time:.2f} seconds.")
 
     return (
         ada_projects,

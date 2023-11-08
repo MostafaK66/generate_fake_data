@@ -1,15 +1,12 @@
 import numpy as np
+import pandas as pd
+from numpy import asarray
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
-from numpy import asarray
-import pandas as pd
-from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import TimeSeriesSplit
-
+from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 
 
 class UnivarientSequencePredictor:
-
     def __init__(self, param_grid, time_series_split_ratio):
         self.param_grid = param_grid
         self.time_series_split_ratio = time_series_split_ratio
@@ -27,7 +24,11 @@ class UnivarientSequencePredictor:
         """
         train = asarray(train)
         trainX, trainy = train[:, :-1], train[:, -1]
-        RF = GridSearchCV(estimator=RandomForestRegressor(random_state=123), param_grid=self.param_grid, cv=TimeSeriesSplit(n_splits=self.time_series_split_ratio))
+        RF = GridSearchCV(
+            estimator=RandomForestRegressor(random_state=123),
+            param_grid=self.param_grid,
+            cv=TimeSeriesSplit(n_splits=self.time_series_split_ratio),
+        )
         RF.fit(trainX, trainy)
         best_model = RF.best_estimator_
         yhat = best_model.predict([testX])
@@ -35,7 +36,7 @@ class UnivarientSequencePredictor:
 
         return yhat[0], {regressor_name: RF.best_params_}
 
-    def walk_forward_validation(self,train, test):
+    def walk_forward_validation(self, train, test):
         """
         Conducts walk forward validation, fitting the model and making predictions step-by-step.
 
@@ -55,15 +56,14 @@ class UnivarientSequencePredictor:
         for i in range(len(test)):
             testX, testy = test[i, :-1], test[i, -1]
             yhat, best_params = self.univarient_predictor(history, testX)
-            predictions.append(yhat)
+            yhat_rounded = round(yhat)
+            predictions.append(yhat_rounded)
             actuals.append(testy)
             best_params_dict.update(best_params)
             history.append(test[i])
 
         mean_absolute_error_value = mean_absolute_error(actuals, predictions)
 
-        results_df = pd.DataFrame({'Actual': actuals, 'Predicted': predictions})
+        results_df = pd.DataFrame({"Actual": actuals, "Predicted": predictions})
 
         return mean_absolute_error_value, results_df, best_params_dict
-
-

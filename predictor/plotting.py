@@ -72,33 +72,50 @@ class DataPlotter:
         plt.savefig(os.path.join(self.output_dir, "projects_plot.png"))
         plt.close(fig)
 
-    def plot_actual_vs_predicted(self, walk_forward_validation_results):
+    def plot_actual_vs_predicted(
+        self, ada_projects, walk_forward_validation_results, split_ratio, n_in
+    ):
         for key, value in walk_forward_validation_results.items():
             results_df = value["ResultsDF"]
 
+            project_number = int(key.split("_")[-1].replace("df", "")) - 1
+            project_df = ada_projects[project_number]
+
+            split_idx = int(len(project_df) * split_ratio)
+
+            test_timestamps = project_df.index[split_idx + n_in :]
+            if len(test_timestamps) != len(results_df):
+                min_length = min(len(test_timestamps), len(results_df))
+                results_df = results_df.iloc[:min_length]
+                test_timestamps = test_timestamps[:min_length]
+
+            results_df.set_index(test_timestamps, inplace=True)
+
             plt.figure(figsize=(10, 5))
 
-            plt.plot(results_df["Actual"], label="Actual", color="blue", marker="o")
-
             plt.plot(
+                results_df.index,
+                results_df["Actual"],
+                label="Actual (Test)",
+                color="blue",
+                marker="o",
+            )
+            plt.plot(
+                results_df.index,
                 results_df["Predicted"],
-                label="Predicted",
+                label="Predicted (Test)",
                 color="red",
                 linestyle="--",
                 marker="x",
             )
 
             plt.title(f"Actual vs Predicted - {key}")
-
             plt.legend()
-
-            plt.xlabel("Index")
+            plt.xlabel("Date")
             plt.ylabel("Ticket Count")
-
             plt.grid(True)
+            plt.xticks(rotation=15)
 
             plot_path = os.path.join(self.output_dir, f"{key}_actual_vs_predicted.png")
-
             plt.savefig(plot_path)
-
             plt.close()

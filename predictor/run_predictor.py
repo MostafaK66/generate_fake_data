@@ -79,7 +79,10 @@ def main():
     progress_bar.close()
 
     plotter.plot_actual_vs_predicted(
-        walk_forward_validation_results=walk_forward_validation_results
+        ada_projects=ada_projects,
+        walk_forward_validation_results=walk_forward_validation_results,
+        split_ratio=settings.SPLIT_RATIO,
+        n_in=settings.N_IN,
     )
     end_time = time.time()
     total_time = end_time - start_time

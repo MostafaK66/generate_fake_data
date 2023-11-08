@@ -65,6 +65,7 @@ def main():
 
     total_iterations = sum(len(splits) for splits in all_train_test_splits)
     progress_bar = tqdm(total=total_iterations, desc="Running walk forward validation")
+    mae_sum = 0
     for col_idx, train_test_splits in enumerate(all_train_test_splits):
         for df_idx, split in enumerate(train_test_splits):
             train, test = split
@@ -75,10 +76,12 @@ def main():
             walk_forward_validation_results[key] = {"MAE": mae, "ResultsDF": results_df}
             best_params_dict[key] = best_params
             mae_dict[key] = mae
+            mae_sum += mae
 
             progress_bar.update(1)
 
     progress_bar.close()
+    average_mae = mae_sum / total_iterations
 
     plotter.plot_actual_vs_predicted(
         ada_projects=ada_projects,
@@ -97,6 +100,7 @@ def main():
         walk_forward_validation_results,
         best_params_dict,
         mae_dict,
+        average_mae,
     )
 
 
@@ -107,6 +111,7 @@ if __name__ == "__main__":
         walk_forward_validation_results,
         best_params_dict,
         mae_dict,
+        average_mae,
     ) = main()
     df1, df2, df3 = ada_projects
     (
@@ -139,4 +144,4 @@ if __name__ == "__main__":
     ]
 
     print(f"best parameters: {best_params_dict}")
-    print(f"calculated MAE: {mae_dict}")
+    print(f"calculated average MAE: {average_mae}")

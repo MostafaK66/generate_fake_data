@@ -72,7 +72,67 @@ class DataPlotter:
         plt.savefig(os.path.join(self.output_dir, "projects_plot.png"))
         plt.close(fig)
 
-    def plot_actual_vs_predicted(
+    def plot_actual_vs_predicted(self, results_df, key):
+        plt.figure(figsize=(10, 5))
+        plt.plot(
+            results_df.index,
+            results_df["Actual"],
+            label="Actual (Test)",
+            color="blue",
+            marker="o",
+        )
+        plt.plot(
+            results_df.index,
+            results_df["Predicted"],
+            label="Predicted (Test)",
+            color="red",
+            linestyle="--",
+            marker="x",
+        )
+        plt.title(f"Actual vs Predicted - {key}")
+        plt.legend()
+        plt.xlabel("Date")
+        plt.ylabel("Ticket Count")
+        plt.grid(True)
+        plt.xticks(rotation=15)
+        plt.tight_layout()
+
+        plot_path = os.path.join(self.output_dir, f"{key}_actual_vs_predicted.png")
+        plt.savefig(plot_path)
+        plt.close()
+
+    def plot_cumulative_actual_vs_predicted(self, results_df, key):
+        plt.figure(figsize=(10, 5))
+        plt.plot(
+            results_df.index,
+            results_df["Cumulative_Actual"],
+            label="Cumulative Actual (Test)",
+            color="blue",
+            marker="o",
+        )
+        plt.plot(
+            results_df.index,
+            results_df["Cumulative_Predicted"],
+            label="Cumulative Predicted (Test)",
+            color="red",
+            linestyle="--",
+            marker="x",
+        )
+        plt.title(f"Cumulative Actual vs Predicted - {key}")
+        plt.legend()
+        plt.xlabel("Date")
+        plt.ylabel("Cumulative Ticket Count")
+        plt.grid(True)
+        plt.xticks(rotation=15)
+        plt.tight_layout()
+
+        plot_path = os.path.join(
+            self.output_dir, f"{key}_cumulative_actual_vs_cumulative_predicted.png"
+        )
+        plt.savefig(plot_path)
+        plt.close()
+
+    def process_and_plot(
         self,
         ada_projects,
         walk_forward_validation_results,
@@ -81,62 +141,33 @@ class DataPlotter:
         last_n_days=None,
     ):
         for key, value in walk_forward_validation_results.items():
-            results_df = value["ResultsDF"]
+            results_df = value["ResultsDF"].copy()
 
             project_number = int(key.split("_")[-1].replace("df", "")) - 1
             project_df = ada_projects[project_number]
 
             split_idx = int(len(project_df) * split_ratio)
 
-            end_date = (
-                pd.Timestamp.now() if last_n_days is None else project_df.index[-1]
-            )
-            start_date = (
-                end_date - pd.Timedelta(days=last_n_days)
-                if last_n_days
-                else project_df.index[0]
-            )
-
-            project_df = project_df[
-                (project_df.index >= start_date) & (project_df.index <= end_date)
-            ]
-
-            split_idx = int(len(project_df) * split_ratio)
+            if last_n_days is not None:
+                end_date = (
+                    pd.Timestamp.now() if last_n_days is None else project_df.index[-1]
+                )
+                start_date = end_date - pd.Timedelta(days=last_n_days)
+                project_df = project_df[
+                    (project_df.index >= start_date) & (project_df.index <= end_date)
+                ]
 
             test_timestamps = project_df.index[split_idx + n_in :]
 
-            if len(test_timestamps) != len(results_df):
-                min_length = min(len(test_timestamps), len(results_df))
-                results_df = results_df.iloc[:min_length]
-                test_timestamps = test_timestamps[:min_length]
+            min_length = min(len(test_timestamps), len(results_df))
+            results_df = results_df.iloc[:min_length]
+            test_timestamps = test_timestamps[:min_length]
 
             results_df.set_index(test_timestamps, inplace=True)
 
-            plt.figure(figsize=(10, 5))
+            self.plot_actual_vs_predicted(results_df, key)
 
-            plt.plot(
-                results_df.index,
-                results_df["Actual"],
-                label="Actual (Test)",
-                color="blue",
-                marker="o",
-            )
-            plt.plot(
-                results_df.index,
-                results_df["Predicted"],
-                label="Predicted (Test)",
-                color="red",
-                linestyle="--",
-                marker="x",
-            )
+            results_df["Cumulative_Actual"] = results_df["Actual"].cumsum()
+            results_df["Cumulative_Predicted"] = results_df["Predicted"].cumsum()
 
-            plt.title(f"Actual vs Predicted - {key}")
-            plt.legend()
-            plt.xlabel("Date")
-            plt.ylabel("Ticket Count")
-            plt.grid(True)
-            plt.xticks(rotation=15)
-
-            plot_path = os.path.join(self.output_dir, f"{key}_actual_vs_predicted.png")
-            plt.savefig(plot_path)
-            plt.close()
+            self.plot_cumulative_actual_vs_predicted(results_df, key)

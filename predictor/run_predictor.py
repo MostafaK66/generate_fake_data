@@ -83,7 +83,7 @@ def main():
     progress_bar.close()
     average_mae = mae_sum / total_iterations
 
-    plotter.plot_actual_vs_predicted(
+    plotter.process_and_plot(
         ada_projects=ada_projects,
         walk_forward_validation_results=walk_forward_validation_results,
         split_ratio=settings.SPLIT_RATIO,

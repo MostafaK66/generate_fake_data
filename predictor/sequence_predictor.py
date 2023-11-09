@@ -1,9 +1,18 @@
 import numpy as np
 import pandas as pd
 from numpy import asarray
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import (
+    GradientBoostingRegressor,
+    RandomForestRegressor,
+    StackingRegressor,
+)
+from sklearn.linear_model import Ridge, SGDRegressor
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import make_pipeline
+from sklearn.svm import SVR
+from xgboost import XGBRegressor
 
 
 class UnivarientSequencePredictor:
@@ -12,29 +21,23 @@ class UnivarientSequencePredictor:
         self.time_series_split_ratio = time_series_split_ratio
 
     def univarient_predictor(self, train, testX):
-        """
-        Fits a Random Forest Regressor on the training data and makes a prediction.
-
-        Args:
-            train (array-like): The training data. Last column should be the target variable.
-            testX (array-like): The test input features.
-
-        Returns:
-            float: Predicted value for the testX.
-        """
-        train = asarray(train)
+        train = np.asarray(train)
         trainX, trainy = train[:, :-1], train[:, -1]
-        RF = GridSearchCV(
-            estimator=RandomForestRegressor(random_state=123),
+        estimators = [("xgb", XGBRegressor()), ("gbr", GradientBoostingRegressor())]
+        stack = StackingRegressor(estimators=estimators, final_estimator=Ridge())
+
+        stack_grid_search = GridSearchCV(
+            estimator=stack,
             param_grid=self.param_grid,
             cv=TimeSeriesSplit(n_splits=self.time_series_split_ratio),
+            n_jobs=1,
         )
-        RF.fit(trainX, trainy)
-        best_model = RF.best_estimator_
+        stack_grid_search.fit(trainX, trainy)
+        best_model = stack_grid_search.best_estimator_
         yhat = best_model.predict([testX])
-        regressor_name = best_model.__class__.__name__
+        regressor_name = "StackingRegressor"
 
-        return yhat[0], {regressor_name: RF.best_params_}
+        return yhat[0], {regressor_name: stack_grid_search.best_params_}
 
     def walk_forward_validation(self, train, test):
         """

@@ -7,7 +7,10 @@ filename = (
 N_IN = 4
 N_OUT = 1
 SPLIT_RATIO = 0.80
-RF_PARAM_GRID = {"n_estimators": [250]}
+RF_PARAM_GRID = {
+    "xgb__n_estimators": [20],
+    "gbr__n_estimators": [20],
+}
 TIME_SERIES_SPLIT_RATIO = 5
 
 """"
@@ -21,6 +24,6 @@ param_grid = {
     'bootstrap': [True],
 }
 
-
+xgboost: "n_estimators": [200], "learning_rate": [0.01, 0.1]
 
 """

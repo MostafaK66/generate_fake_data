@@ -104,7 +104,7 @@ class AdaBottleneckGenerator:
 
     def ticket_created_date(self, backlog_date: date) -> date:
         """Compute the ticket creation date based on the backlog date."""
-        days_to_subtract = random.choice([1, 3, 5, 7, 9, 11])
+        days_to_subtract = random.choice([1, 2])
         return backlog_date - timedelta(days=days_to_subtract)
 
     def assign_pi(self, df: pd.DataFrame) -> pd.DataFrame:

@@ -8,8 +8,10 @@ N_IN = 4
 N_OUT = 1
 SPLIT_RATIO = 0.80
 RF_PARAM_GRID = {
-    "xgb__n_estimators": [1],
-    "gbr__n_estimators": [1],
+    "xgb__n_estimators": [100],
+    "xgb__booster": ["gbtree", "dart"],
+    "xgb__learning_rate": [0.01, 0.1],
+    "xgb__max_depth": [4, 6, 20],
 }
 TIME_SERIES_SPLIT_RATIO = 5
 

@@ -23,8 +23,12 @@ class UnivarientSequencePredictor:
     def univarient_predictor(self, train, testX):
         train = np.asarray(train)
         trainX, trainy = train[:, :-1], train[:, -1]
-        estimators = [("xgb", XGBRegressor()), ("gbr", GradientBoostingRegressor())]
-        stack = StackingRegressor(estimators=estimators, final_estimator=Ridge())
+        estimators = [
+            ("xgb", XGBRegressor(device="cpu", verbosity=1, random_state=123))
+        ]
+        stack = StackingRegressor(
+            estimators=estimators, final_estimator=SGDRegressor(max_iter=1000)
+        )
 
         stack_grid_search = GridSearchCV(
             estimator=stack,

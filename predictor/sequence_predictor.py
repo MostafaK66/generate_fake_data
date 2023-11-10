@@ -8,7 +8,7 @@ from sklearn.ensemble import (
 )
 from sklearn.linear_model import Ridge, SGDRegressor
 from sklearn.metrics import mean_absolute_error
-from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, TimeSeriesSplit
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import make_pipeline
 from sklearn.svm import SVR
@@ -16,9 +16,10 @@ from xgboost import XGBRegressor
 
 
 class UnivarientSequencePredictor:
-    def __init__(self, param_grid, time_series_split_ratio):
-        self.param_grid = param_grid
+    def __init__(self, param_distributions, time_series_split_ratio, n_iter):
+        self.param_distributions = param_distributions
         self.time_series_split_ratio = time_series_split_ratio
+        self.n_iter = n_iter
 
     def univarient_predictor(self, train, testX):
         train = np.asarray(train)
@@ -30,18 +31,19 @@ class UnivarientSequencePredictor:
             estimators=estimators, final_estimator=SGDRegressor(max_iter=1000)
         )
 
-        stack_grid_search = GridSearchCV(
+        stack_random_search = RandomizedSearchCV(
             estimator=stack,
-            param_grid=self.param_grid,
+            param_distributions=self.param_distributions,
             cv=TimeSeriesSplit(n_splits=self.time_series_split_ratio),
+            random_state=123,
             n_jobs=1,
         )
-        stack_grid_search.fit(trainX, trainy)
-        best_model = stack_grid_search.best_estimator_
+        stack_random_search.fit(trainX, trainy)
+        best_model = stack_random_search.best_estimator_
         yhat = best_model.predict([testX])
         regressor_name = "StackingRegressor"
 
-        return yhat[0], {regressor_name: stack_grid_search.best_params_}
+        return yhat[0], {regressor_name: stack_random_search.best_params_}
 
     def walk_forward_validation(self, train, test):
         """

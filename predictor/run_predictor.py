@@ -22,8 +22,9 @@ def main():
     run_ada.ada_df_generator()
     preprocessor = DataPreprocessor(split_ratio=settings.SPLIT_RATIO)
     predictor = UnivarientSequencePredictor(
-        param_grid=settings.RF_PARAM_GRID,
+        param_distributions=settings.PARAM_DISTRIBUTION,
         time_series_split_ratio=settings.TIME_SERIES_SPLIT_RATIO,
+        n_iter=settings.NUMBER_OF_RANDOMIZED_ITERATIONS,
     )
     plotter = DataPlotter()
     walk_forward_validation_results = {}

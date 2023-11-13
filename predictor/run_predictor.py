@@ -1,9 +1,11 @@
 import logging
 
 logging.basicConfig(level=logging.WARNING)
+import json
 import os
 import sys
 import time
+from pathlib import Path
 
 import pandas as pd
 import settings
@@ -15,6 +17,11 @@ from predictor.plotting import DataPlotter
 
 sys.path.append(os.path.abspath("../../"))
 from generate_fake_data.mocked_up import run_ada
+
+script_dir = Path(__file__).resolve().parent
+params_dir = script_dir / "params"
+params_dir.mkdir(exist_ok=True)
+params_file_path = params_dir / "best_params_dict.txt"
 
 
 def main():
@@ -80,6 +87,8 @@ def main():
             mae_sum += mae
 
             progress_bar.update(1)
+    with open(params_file_path, "w") as file:
+        file.write(json.dumps(best_params_dict, indent=4))
 
     progress_bar.close()
     average_mae = mae_sum / total_iterations

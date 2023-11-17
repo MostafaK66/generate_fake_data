@@ -140,6 +140,10 @@ class DataPlotter:
         n_in,
         last_n_days=None,
     ):
+        output_dir = os.path.join(os.getcwd(), "prediction_output")
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        all_results = []
         for key, value in walk_forward_validation_results.items():
             results_df = value["ResultsDF"].copy()
 
@@ -171,3 +175,8 @@ class DataPlotter:
             results_df["Cumulative_Predicted"] = results_df["Predicted"].cumsum()
 
             self.plot_cumulative_actual_vs_predicted(results_df, key)
+            results_df["Project"] = key
+            all_results.append(results_df)
+        combined_results_df = pd.concat(all_results)
+        csv_file_path = os.path.join(output_dir, "combined_results.csv")
+        combined_results_df.to_csv(csv_file_path)

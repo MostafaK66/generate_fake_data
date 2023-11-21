@@ -13,7 +13,7 @@ from sequence_predictor import UnivarientSequencePredictor
 from tqdm import tqdm
 from utility import DataPreprocessor
 
-from predictor.plotting import DataPlotter
+from predictor.process_output import OutPutProcessor
 
 sys.path.append(os.path.abspath("../../"))
 from generate_fake_data.mocked_up import run_ada
@@ -33,7 +33,7 @@ def main():
         time_series_split_ratio=settings.TIME_SERIES_SPLIT_RATIO,
         n_iter=settings.NUMBER_OF_RANDOMIZED_ITERATIONS,
     )
-    plotter = DataPlotter()
+    out_processor = OutPutProcessor()
     walk_forward_validation_results = {}
     col_names = ["PredictedDone", "PredictedFlow"]
     best_params_dict = {}
@@ -49,7 +49,7 @@ def main():
     ada_projects = [
         preprocessor.fill_consecutive_dates(project) for project in ada_projects
     ]
-    plotter.plot_projects(
+    out_processor.plot_projects(
         ada_projects=ada_projects, split_ratio=settings.SPLIT_RATIO, last_n_days=None
     )
 
@@ -93,12 +93,15 @@ def main():
     progress_bar.close()
     average_mae = mae_sum / total_iterations
 
-    plotter.process_and_plot(
+    combined_results_df = out_processor.process_and_plot(
         ada_projects=ada_projects,
         walk_forward_validation_results=walk_forward_validation_results,
         split_ratio=settings.SPLIT_RATIO,
         n_in=settings.N_IN,
         last_n_days=None,
+    )
+    df_type = out_processor.add_type_column(
+        df=combined_results_df, prediction_info_column="PredictionInfo"
     )
     end_time = time.time()
     total_time = end_time - start_time

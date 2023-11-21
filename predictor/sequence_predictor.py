@@ -28,7 +28,7 @@ class UnivarientSequencePredictor:
             ("xgb", XGBRegressor(device="cpu", verbosity=1, random_state=123))
         ]
         stack = StackingRegressor(
-            estimators=estimators, final_estimator=SGDRegressor(max_iter=1000)
+            estimators=estimators, final_estimator=SGDRegressor(max_iter=500)
         )
 
         stack_random_search = RandomizedSearchCV(

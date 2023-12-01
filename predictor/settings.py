@@ -9,7 +9,7 @@ filename = (
 N_IN = 4
 N_OUT = 1
 SPLIT_RATIO = 0.80
-PARAM_DISTRIBUTION = {
+PARAM_DISTRIBUTION_ENSEMBLE = {
     "xgb__n_estimators": randint(50, 150),
     "xgb__booster": ["gbtree", "dart"],
     "xgb__learning_rate": uniform(0.01, 0.2),

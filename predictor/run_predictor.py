@@ -29,7 +29,7 @@ def main():
     run_ada.ada_df_generator()
     preprocessor = DataPreprocessor(split_ratio=settings.SPLIT_RATIO)
     predictor = EnsembleUnivarientSequencePredictor(
-        param_distributions=settings.PARAM_DISTRIBUTION,
+        param_distributions=settings.PARAM_DISTRIBUTION_ENSEMBLE,
         time_series_split_ratio=settings.TIME_SERIES_SPLIT_RATIO,
         n_iter=settings.NUMBER_OF_RANDOMIZED_ITERATIONS,
     )

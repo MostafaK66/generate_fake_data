@@ -9,7 +9,8 @@ from pathlib import Path
 
 import pandas as pd
 import settings
-from ensemble_sequence_predictor import EnsembleUnivarientSequencePredictor
+
+# from ensemble_sequence_predictor import EnsembleUnivarientSequencePredictor
 from single_sequence_predictor import SingleUnivarientSequencePredictor
 from tqdm import tqdm
 from utility import DataPreprocessor
@@ -29,8 +30,13 @@ def main():
     start_time = time.time()
     run_ada.ada_df_generator()
     preprocessor = DataPreprocessor(split_ratio=settings.SPLIT_RATIO)
-    predictor = EnsembleUnivarientSequencePredictor(
-        param_distributions=settings.PARAM_DISTRIBUTION_ENSEMBLE,
+    # predictor = EnsembleUnivarientSequencePredictor(
+    #     param_distributions=settings.PARAM_DISTRIBUTION_ENSEMBLE,
+    #     time_series_split_ratio=settings.TIME_SERIES_SPLIT_RATIO,
+    #     n_iter=settings.NUMBER_OF_RANDOMIZED_ITERATIONS,
+    # )
+    predictor = SingleUnivarientSequencePredictor(
+        param_distributions=settings.PARAM_DISTRIBUTION_SINGLE,
         time_series_split_ratio=settings.TIME_SERIES_SPLIT_RATIO,
         n_iter=settings.NUMBER_OF_RANDOMIZED_ITERATIONS,
     )

@@ -24,26 +24,26 @@ class SingleUnivarientSequencePredictor:
     def univarient_predictor(self, train, testX):
         train = np.asarray(train)
         trainX, trainy = train[:, :-1], train[:, -1]
-        estimators = [
-            ("xgb", XGBRegressor(device="cpu", verbosity=1, random_state=123))
-        ]
-        stack = StackingRegressor(
-            estimators=estimators, final_estimator=SGDRegressor(max_iter=500)
-        )
+        # estimators = [
+        #     ("xgb", XGBRegressor(device="cpu", verbosity=1, random_state=123))
+        # ]
+        # stack = StackingRegressor(
+        #     estimators=estimators, final_estimator=SGDRegressor(max_iter=500)
+        # )
 
-        stack_random_search = RandomizedSearchCV(
-            estimator=stack,
+        xgboosting = RandomizedSearchCV(
+            estimator=XGBRegressor(),
             param_distributions=self.param_distributions,
             cv=TimeSeriesSplit(n_splits=self.time_series_split_ratio),
             random_state=123,
             n_jobs=1,
         )
-        stack_random_search.fit(trainX, trainy)
-        best_model = stack_random_search.best_estimator_
+        xgboosting.fit(trainX, trainy)
+        best_model = xgboosting.best_estimator_
         yhat = best_model.predict([testX])
-        regressor_name = "StackingRegressor"
+        regressor_name = "XGBoostRegressor"
 
-        return yhat[0], {regressor_name: stack_random_search.best_params_}
+        return yhat[0], {regressor_name: xgboosting.best_params_}
 
     def walk_forward_validation(self, train, test):
         """

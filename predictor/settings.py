@@ -15,5 +15,12 @@ PARAM_DISTRIBUTION_ENSEMBLE = {
     "xgb__learning_rate": uniform(0.01, 0.2),
     "xgb__max_depth": randint(4, 20),
 }
+
+PARAM_DISTRIBUTION_SINGLE = {
+    "n_estimators": randint(2, 6),
+    "booster": ["gbtree"],
+    "learning_rate": uniform(0.01, 0.2),
+    "max_depth": randint(4, 8),
+}
 TIME_SERIES_SPLIT_RATIO = 5
-NUMBER_OF_RANDOMIZED_ITERATIONS = 4
+NUMBER_OF_RANDOMIZED_ITERATIONS = 1

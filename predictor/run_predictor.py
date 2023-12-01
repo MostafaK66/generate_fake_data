@@ -10,6 +10,7 @@ from pathlib import Path
 import pandas as pd
 import settings
 from ensemble_sequence_predictor import EnsembleUnivarientSequencePredictor
+from single_sequence_predictor import SingleUnivarientSequencePredictor
 from tqdm import tqdm
 from utility import DataPreprocessor
 

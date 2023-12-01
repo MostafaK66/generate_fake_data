@@ -15,7 +15,7 @@ from sklearn.svm import SVR
 from xgboost import XGBRegressor
 
 
-class UnivarientSequencePredictor:
+class EnsembleUnivarientSequencePredictor:
     def __init__(self, param_distributions, time_series_split_ratio, n_iter):
         self.param_distributions = param_distributions
         self.time_series_split_ratio = time_series_split_ratio

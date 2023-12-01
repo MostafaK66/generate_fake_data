@@ -10,10 +10,10 @@ N_IN = 4
 N_OUT = 1
 SPLIT_RATIO = 0.80
 PARAM_DISTRIBUTION = {
-    "xgb__n_estimators": randint(1, 2),
-    # "xgb__booster": ["gbtree", "dart"],
-    # "xgb__learning_rate": uniform(0.01, 0.2),
+    "xgb__n_estimators": randint(50, 150),
+    "xgb__booster": ["gbtree", "dart"],
+    "xgb__learning_rate": uniform(0.01, 0.2),
     "xgb__max_depth": randint(4, 20),
 }
 TIME_SERIES_SPLIT_RATIO = 5
-NUMBER_OF_RANDOMIZED_ITERATIONS = 1
+NUMBER_OF_RANDOMIZED_ITERATIONS = 4

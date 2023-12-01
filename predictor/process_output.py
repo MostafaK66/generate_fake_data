@@ -199,7 +199,31 @@ class OutPutProcessor:
         os.makedirs(output_dir, exist_ok=True)
 
         output_path = os.path.join(output_dir, "categorized_predictions.csv")
-        df.to_csv(output_path, index=False)
+        df.to_csv(output_path, index=True)
+
+        print(f"File saved to {output_path}")
+
+        return df
+
+    def add_project_column(self, df, prediction_info_column="PredictionInfo"):
+        df[prediction_info_column] = df[prediction_info_column].astype(str)
+
+        project_mapping = {
+            "df1": "ADA_Project_1",
+            "df2": "ADA_Project_2",
+            "df3": "ADA_Project_3",
+        }
+
+        df["Project"] = df[prediction_info_column].apply(
+            lambda x: next(
+                (project_mapping[key] for key in project_mapping if key in x), None
+            )
+        )
+
+        output_dir = os.path.join(os.getcwd(), "prediction_output")
+        os.makedirs(output_dir, exist_ok=True)
+        output_path = os.path.join(output_dir, "project_mapped_predictions.csv")
+        df.to_csv(output_path, index=True)
 
         print(f"File saved to {output_path}")
 

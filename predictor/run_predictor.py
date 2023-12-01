@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pandas as pd
 import settings
-from sequence_predictor import UnivarientSequencePredictor
+from sequence_predictor import EnsembleUnivarientSequencePredictor
 from tqdm import tqdm
 from utility import DataPreprocessor
 
@@ -28,7 +28,7 @@ def main():
     start_time = time.time()
     run_ada.ada_df_generator()
     preprocessor = DataPreprocessor(split_ratio=settings.SPLIT_RATIO)
-    predictor = UnivarientSequencePredictor(
+    predictor = EnsembleUnivarientSequencePredictor(
         param_distributions=settings.PARAM_DISTRIBUTION,
         time_series_split_ratio=settings.TIME_SERIES_SPLIT_RATIO,
         n_iter=settings.NUMBER_OF_RANDOMIZED_ITERATIONS,
@@ -102,6 +102,9 @@ def main():
     )
     df_type = out_processor.add_type_column(
         df=combined_results_df, prediction_info_column="PredictionInfo"
+    )
+    df_project = out_processor.add_project_column(
+        df=df_type, prediction_info_column="PredictionInfo"
     )
     end_time = time.time()
     total_time = end_time - start_time

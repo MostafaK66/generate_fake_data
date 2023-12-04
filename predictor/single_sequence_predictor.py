@@ -1,3 +1,6 @@
+import os
+
+import joblib
 import numpy as np
 import pandas as pd
 from numpy import asarray
@@ -37,7 +40,16 @@ class SingleUnivarientSequencePredictor:
         yhat = best_model.predict([testX])
         regressor_name = "XGBoostRegressor"
 
-        return yhat[0], {regressor_name: xgboosting.best_params_}
+        return yhat[0], {regressor_name: xgboosting.best_params_}, best_model
+
+    def save_best_model(self, best_model, model_name):
+        model_dir = os.path.join(os.getcwd(), "best_models")
+        if not os.path.exists(model_dir):
+            os.makedirs(model_dir)
+
+        model_path = os.path.join(model_dir, f"{model_name}.joblib")
+        joblib.dump(best_model, model_path)
+        print(f"Saved best model to {model_path}")
 
     def walk_forward_validation(self, train, test):
         """
@@ -54,19 +66,27 @@ class SingleUnivarientSequencePredictor:
         predictions = list()
         actuals = list()
         best_params_dict = {}
+        best_model = None
+        best_mae = float("inf")
         history = [x for x in train]
 
         for i in range(len(test)):
             testX, testy = test[i, :-1], test[i, -1]
-            yhat, best_params = self.univarient_predictor(history, testX)
+            yhat, best_params, model = self.univarient_predictor(history, testX)
             yhat_rounded = round(yhat)
             predictions.append(yhat_rounded)
             actuals.append(testy)
             best_params_dict.update(best_params)
             history.append(test[i])
+            best_model = model
+
+            # current_mae = mean_absolute_error([testy], [yhat_rounded])
+            # if current_mae < best_mae:
+            #     best_mae = current_mae
+            #     best_model = model
 
         mean_absolute_error_value = mean_absolute_error(actuals, predictions)
 
         results_df = pd.DataFrame({"Actual": actuals, "Predicted": predictions})
 
-        return mean_absolute_error_value, results_df, best_params_dict
+        return mean_absolute_error_value, results_df, best_params_dict, best_model

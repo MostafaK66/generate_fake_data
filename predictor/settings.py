@@ -17,10 +17,10 @@ PARAM_DISTRIBUTION_ENSEMBLE = {
 }
 
 PARAM_DISTRIBUTION_SINGLE = {
-    "n_estimators": randint(2, 6),
-    "booster": ["gbtree"],
+    "n_estimators": randint(50, 250),
+    "booster": ["gbtree", "dart"],
     "learning_rate": uniform(0.01, 0.2),
-    "max_depth": randint(4, 8),
+    "max_depth": randint(4, 20),
 }
 TIME_SERIES_SPLIT_RATIO = 5
-NUMBER_OF_RANDOMIZED_ITERATIONS = 1
+NUMBER_OF_RANDOMIZED_ITERATIONS = 5

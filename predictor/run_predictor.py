@@ -84,14 +84,19 @@ def main():
     for col_idx, train_test_splits in enumerate(all_train_test_splits):
         for df_idx, split in enumerate(train_test_splits):
             train, test = split
-            mae, results_df, best_params = predictor.walk_forward_validation(
-                train, test
-            )
+            (
+                mae,
+                results_df,
+                best_params,
+                best_model,
+            ) = predictor.walk_forward_validation(train, test)
             key = f"splits_{col_names[col_idx]}_df{df_idx + 1}"
             walk_forward_validation_results[key] = {"MAE": mae, "ResultsDF": results_df}
             best_params_dict[key] = best_params
             mae_dict[key] = mae
             mae_sum += mae
+            if best_model:
+                predictor.save_best_model(best_model, f"BestModel_{key}")
 
             progress_bar.update(1)
     with open(params_file_path, "w") as file:

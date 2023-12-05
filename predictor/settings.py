@@ -17,7 +17,7 @@ PARAM_DISTRIBUTION_ENSEMBLE = {
 }
 
 PARAM_DISTRIBUTION_SINGLE = {
-    "n_estimators": randint(1, 10),
+    "n_estimators": randint(1, 15),
     "booster": ["gbtree", "dart"],
     "learning_rate": uniform(0.01, 0.2),
     "max_depth": randint(4, 10),

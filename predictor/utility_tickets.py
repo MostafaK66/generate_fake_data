@@ -1,19 +1,22 @@
 from pathlib import Path
-import pandas as pd
-from typing import Union, List
+from typing import List, Union
+
 import numpy as np
+import pandas as pd
+
 
 class DataPreprocessor:
     def __init__(self, split_ratio):
         self.split_ratio = split_ratio
 
     def read_data(self, filename):
-
         filename = filename if isinstance(filename, Path) else Path(filename)
 
         return pd.read_csv(filename, dtype={"PI": str})
 
-    def split_and_sort(self, df: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
+    def split_and_sort(
+        self, df: pd.DataFrame
+    ) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
         """
         Split the dataframe into three based on TicketProject values and sort by TicketCreatedDate.
 
@@ -21,11 +24,13 @@ class DataPreprocessor:
         :return: Three dataframes for ADA_Project_1, ADA_Project_2, and ADA_Project_3.
         """
 
-        project_names = ['ADA_Project_1', 'ADA_Project_2', 'ADA_Project_3']
+        project_names = ["ADA_Project_1", "ADA_Project_2", "ADA_Project_3"]
         result_dfs = []
 
         for project in project_names:
-            project_df = df[df['TicketProject'] == project].sort_values(by='TicketCreatedDate')
+            project_df = df[df["TicketProject"] == project].sort_values(
+                by="TicketCreatedDate"
+            )
             result_dfs.append(project_df)
 
         return tuple(result_dfs)
@@ -42,7 +47,6 @@ class DataPreprocessor:
             print(f"Required column ('{required_col}') not found in the dataframe")
             return df
 
-
         done_tickets_per_date = (
             df[df["TicketStatus"] == "Done"]
             .groupby("TicketCreatedDate")
@@ -50,11 +54,7 @@ class DataPreprocessor:
             .reset_index(name="DoneTicketsCount")
         )
 
-
-        df = df.merge(
-            done_tickets_per_date, on="TicketCreatedDate", how="left"
-        )
-
+        df = df.merge(done_tickets_per_date, on="TicketCreatedDate", how="left")
 
         df["DoneTicketsCount"] = df["DoneTicketsCount"].fillna(0).astype(int)
 
@@ -74,7 +74,6 @@ class DataPreprocessor:
             print(f"Required column ('{required_col}') not found in the dataframe")
             return df
 
-
         valid_tickets_per_date = (
             df[df["TicketStatus"].isin(statuses)]
             .groupby("TicketCreatedDate")
@@ -82,11 +81,7 @@ class DataPreprocessor:
             .reset_index(name="FlowTicketsCount")
         )
 
-
-        df = df.merge(
-            valid_tickets_per_date, on="TicketCreatedDate", how="left"
-        )
-
+        df = df.merge(valid_tickets_per_date, on="TicketCreatedDate", how="left")
 
         df["FlowTicketsCount"] = df["FlowTicketsCount"].fillna(0).astype(int)
 
@@ -100,9 +95,9 @@ class DataPreprocessor:
         :param df: Input dataframe.
         :return: Filtered dataframe.
         """
-        df_filtered = df[['TicketCreatedDate', "DoneTicketsCount", "FlowTicketsCount"]]
+        df_filtered = df[["TicketCreatedDate", "DoneTicketsCount", "FlowTicketsCount"]]
 
-        df_filtered = df_filtered.drop_duplicates(subset='TicketCreatedDate')
+        df_filtered = df_filtered.drop_duplicates(subset="TicketCreatedDate")
 
         return df_filtered
 
@@ -115,16 +110,14 @@ class DataPreprocessor:
         :return: DataFrame with consecutive dates and forward-filled values.
         """
 
-        df['TicketCreatedDate'] = pd.to_datetime(df['TicketCreatedDate'])
+        df["TicketCreatedDate"] = pd.to_datetime(df["TicketCreatedDate"])
 
-
-        df.set_index('TicketCreatedDate', inplace=True)
+        df.set_index("TicketCreatedDate", inplace=True)
         all_dates = pd.date_range(start=df.index.min(), end=df.index.max())
         df = df.reindex(all_dates)
 
-
-        df['DoneTicketsCount'] = df['DoneTicketsCount'].ffill().astype(int)
-        df['FlowTicketsCount'] = df['FlowTicketsCount'].ffill().astype(int)
+        df["DoneTicketsCount"] = df["DoneTicketsCount"].ffill().astype(int)
+        df["FlowTicketsCount"] = df["FlowTicketsCount"].ffill().astype(int)
 
         return df
 
@@ -168,7 +161,9 @@ class DataPreprocessor:
         transformed_data = []
         for df in dataframes:
             series = df.iloc[:, col_idx]
-            transformed_data.append(self.series_to_supervised(series, n_in=n_in, n_out=n_out))
+            transformed_data.append(
+                self.series_to_supervised(series, n_in=n_in, n_out=n_out)
+            )
         return transformed_data
 
     def train_test_split(self, series: pd.Series):
@@ -181,41 +176,3 @@ class DataPreprocessor:
         train_size = int(len(series) * self.split_ratio)
         train, test = series[:train_size], series[train_size:]
         return train, test
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

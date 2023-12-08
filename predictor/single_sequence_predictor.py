@@ -20,7 +20,7 @@ from xgboost import XGBRegressor
 
 class SingleUnivarientSequencePredictor:
     def __init__(
-        self, param_distributions, time_series_split_ratio, n_iter, optimize_model=False
+        self, param_distributions, time_series_split_ratio, n_iter, optimize_model=True
     ):
         self.param_distributions = param_distributions
         self.time_series_split_ratio = time_series_split_ratio
